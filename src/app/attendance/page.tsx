@@ -43,6 +43,9 @@ export default function AttendancePage() {
 
   const [submitting, setSubmitting] =
     useState(false);
+  
+  const [currentTime, setCurrentTime] =
+  useState(new Date());
 
   useEffect(() => {
 
@@ -80,6 +83,11 @@ export default function AttendancePage() {
 
     );
 
+    const timer = setInterval(() => {
+    setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer); 
   }, [router]);
 
   function handlePhotoChange(
@@ -215,6 +223,34 @@ export default function AttendancePage() {
       </section>
 
       <section className="px-4 -mt-5 max-w-md mx-auto">
+
+        <section className="px-4 -mt-4 max-w-md mx-auto mb-4">
+
+  <div className="bg-white rounded-3xl shadow-lg p-5">
+
+    <p className="text-sm text-gray-500 mb-1">
+      Current Time
+    </p>
+
+    <h2 className="text-3xl font-bold tracking-tight">
+      {currentTime.toLocaleTimeString("id-ID")}
+    </h2>
+
+    <p className="text-sm text-gray-600 mt-2">
+      {currentTime.toLocaleDateString(
+        "id-ID",
+        {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }
+      )}
+    </p>
+
+  </div>
+
+</section>
 
         <div className="bg-white rounded-3xl shadow-xl p-5 space-y-5">
 
@@ -415,7 +451,7 @@ export default function AttendancePage() {
               <FileText size={18} />
 
               <h3 className="font-semibold">
-                Notes
+                Catatan
               </h3>
 
             </div>

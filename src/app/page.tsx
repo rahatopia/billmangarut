@@ -64,9 +64,13 @@ export default function HomePage() {
       <div className="bg-white p-8 rounded-2xl shadow-md w-full max-w-sm">
 
         <h1 className="text-2xl font-bold text-center mb-6">
-          Attendance App
+          Laporan Absensi
         </h1>
 
+        <h1 className="text-2xl font-bold text-center mb-6">
+          BILLMAN UP3 GARUT
+        </h1>
+        
         <form
           onSubmit={handleLogin}
           className="space-y-4"
