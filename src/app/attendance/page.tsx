@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 
 import { submitAttendance } from "@/services/api";
+import { compressImage } from "@/utils/compressImage";
+import { fileToBase64 } from "@/utils/fileToBase64";
 
 export default function AttendancePage() {
 
@@ -43,9 +45,9 @@ export default function AttendancePage() {
 
   const [submitting, setSubmitting] =
     useState(false);
-  
+
   const [currentTime, setCurrentTime] =
-  useState(new Date());
+    useState(new Date());
 
   useEffect(() => {
 
@@ -78,16 +80,23 @@ export default function AttendancePage() {
 
         setLoadingLocation(false);
 
-        alert("Failed to get GPS location");
+        alert("Gagal Mendapatkan GPS, Pastikan GPS Aktif dan Beri Izin Akses Lokasi");
+      },
+
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
       }
 
     );
 
     const timer = setInterval(() => {
-    setCurrentTime(new Date());
+      setCurrentTime(new Date());
     }, 1000);
 
-    return () => clearInterval(timer); 
+    return () => clearInterval(timer);
+
   }, [router]);
 
   function handlePhotoChange(
@@ -110,13 +119,52 @@ export default function AttendancePage() {
     }
   }
 
+  function refreshLocation() {
+
+    setLoadingLocation(true);
+
+    navigator.geolocation.getCurrentPosition(
+
+      (position) => {
+
+        setLocation({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          accuracy: position.coords.accuracy,
+        });
+
+        setLoadingLocation(false);
+      },
+
+      (error) => {
+
+        console.error(error);
+
+        setLoadingLocation(false);
+
+        alert("Gagal Memperbaharui GPS, Coba Lagi");
+      },
+
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
+      }
+
+    );
+  }
+
   async function handleSubmit() {
+
+    if (submitting) return;
 
     if (
       attendanceType === "HADIR" &&
       !photo
     ) {
-      alert("Please take a photo first");
+
+      alert("Selfie dulu ya untuk absen hadir");
+
       return;
     }
 
@@ -124,7 +172,22 @@ export default function AttendancePage() {
       attendanceType === "HADIR" &&
       !location
     ) {
-      alert("GPS location not detected");
+
+      alert("Lokasi GPS dibutuhkan untuk absen hadir");
+
+      return;
+    }
+
+    if (
+      attendanceType === "HADIR" &&
+      location &&
+      location.accuracy > 100
+    ) {
+
+      alert(
+        "Akurasi GPS terlalu rendah. Silakan pindah ke area terbuka dan coba lagi."
+      );
+
       return;
     }
 
@@ -132,11 +195,28 @@ export default function AttendancePage() {
 
       setSubmitting(true);
 
+      let base64Photo = "";
+
+      if (
+        photo &&
+        attendanceType === "HADIR"
+      ) {
+
+        const compressedPhoto =
+          await compressImage(photo);
+
+        base64Photo =
+          await fileToBase64(
+            compressedPhoto
+          );
+      }
+
       const result =
         await submitAttendance({
 
           username: user.username,
           name: user.name,
+          unit: user.unit,
 
           type: attendanceType,
 
@@ -150,12 +230,14 @@ export default function AttendancePage() {
             location?.accuracy || "",
 
           notes,
+
+          photo: base64Photo,
         });
 
       if (result.success) {
 
         alert(
-          "Attendance submitted successfully"
+          "Absensi berhasil dikirim, Semoga Lancar selalu ya!"
         );
 
         setPhoto(null);
@@ -172,7 +254,7 @@ export default function AttendancePage() {
 
       console.error(error);
 
-      alert("Submission failed");
+      alert("Gagal Mengirim Absensi, Coba Lagi");
 
     } finally {
 
@@ -222,42 +304,42 @@ export default function AttendancePage() {
 
       </section>
 
-      <section className="px-4 -mt-5 max-w-md mx-auto">
+      <section className="px-4 -mt-4 max-w-md mx-auto mb-4">
 
-        <section className="px-4 -mt-4 max-w-md mx-auto mb-4">
+        <div className="bg-white rounded-3xl shadow-lg p-5">
 
-  <div className="bg-white rounded-3xl shadow-lg p-5">
+          <p className="text-sm text-gray-500 mb-1">
+            Waktu Absensi
+          </p>
 
-    <p className="text-sm text-gray-500 mb-1">
-      Current Time
-    </p>
+          <h2 className="text-3xl font-bold tracking-tight">
+            {currentTime.toLocaleTimeString("id-ID")}
+          </h2>
 
-    <h2 className="text-3xl font-bold tracking-tight">
-      {currentTime.toLocaleTimeString("id-ID")}
-    </h2>
+          <p className="text-sm text-gray-600 mt-2">
+            {currentTime.toLocaleDateString(
+              "id-ID",
+              {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              }
+            )}
+          </p>
 
-    <p className="text-sm text-gray-600 mt-2">
-      {currentTime.toLocaleDateString(
-        "id-ID",
-        {
-          weekday: "long",
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        }
-      )}
-    </p>
+        </div>
 
-  </div>
+      </section>
 
-</section>
+      <section className="px-4 max-w-md mx-auto">
 
         <div className="bg-white rounded-3xl shadow-xl p-5 space-y-5">
 
           <div>
 
             <h2 className="text-xl font-bold text-gray-900">
-              Absensi harian
+              Absensi Harian
             </h2>
 
             <p className="text-sm text-gray-500 mt-1">
@@ -300,10 +382,6 @@ export default function AttendancePage() {
                 Izin
               </option>
 
-              <option value="CUTI">
-                Cuti
-              </option>
-
             </select>
 
           </div>
@@ -334,7 +412,7 @@ export default function AttendancePage() {
 
                 <div className="w-full h-64 rounded-2xl border-2 border-dashed flex items-center justify-center text-gray-400 mb-4">
 
-                  No photo selected
+                  Belum ada foto diambil
 
                 </div>
 
@@ -387,7 +465,7 @@ export default function AttendancePage() {
                     size={16}
                   />
 
-                  Detecting your location...
+                  Mendeteksi lokasimu...
 
                 </div>
 
@@ -399,7 +477,7 @@ export default function AttendancePage() {
 
                     <CheckCircle2 size={16} />
 
-                    Location detected
+                    Lokasi Terdeteksi
 
                   </div>
 
@@ -417,13 +495,23 @@ export default function AttendancePage() {
                       {location.longitude}
                     </p>
 
-                    <p>
+                    <p
+                      className={
+                        location.accuracy <= 20
+                          ? "text-green-600 font-medium"
+                          : location.accuracy <= 50
+                          ? "text-yellow-600 font-medium"
+                          : "text-red-600 font-medium"
+                      }
+                    >
+
                       Accuracy:
                       {" "}
+
                       {Math.round(
                         location.accuracy
-                      )}
-                      m
+                      )} m
+
                     </p>
 
                   </div>
@@ -434,11 +522,20 @@ export default function AttendancePage() {
 
                 <p className="text-sm text-red-500">
 
-                  Failed to get location
+                  Gagal Mendapatkan Lokasi
 
                 </p>
 
               )}
+
+              <button
+                onClick={refreshLocation}
+                className="mt-4 w-full border py-3 rounded-2xl font-medium active:scale-[0.98] transition"
+              >
+
+                Refresh GPS
+
+              </button>
 
             </div>
 
@@ -451,7 +548,7 @@ export default function AttendancePage() {
               <FileText size={18} />
 
               <h3 className="font-semibold">
-                Catatan
+                Rencana Kerja Hari Ini
               </h3>
 
             </div>
@@ -471,7 +568,20 @@ export default function AttendancePage() {
           <button
             onClick={handleSubmit}
             disabled={submitting}
-            className="w-full bg-black text-white py-4 rounded-2xl font-semibold text-lg shadow-lg active:scale-[0.98] transition disabled:opacity-50"
+            className="
+            w-full
+            bg-black
+            text-white
+            py-4
+            rounded-2xl
+            font-semibold
+            text-lg
+            shadow-lg
+            active:scale-[0.98]
+            transition
+            disabled:opacity-50
+            disabled:cursor-not-allowed
+            "
           >
 
             {submitting
