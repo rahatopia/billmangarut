@@ -271,9 +271,9 @@ export default function AttendancePage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-200 pb-10">
+    <main className="min-h-screen bg-bg-[#F8F3F0] pb-10">
 
-      <section className="bg-black text-white rounded-b-3xl px-5 pt-6 pb-8 shadow-lg">
+      <section className="bg-[#014BAA] text-white rounded-b-3xl px-5 pt-6 pb-8 shadow-lg">
 
         <div className="flex items-start justify-between">
 
@@ -367,7 +367,7 @@ export default function AttendancePage() {
                   e.target.value
                 )
               }
-              className="w-full border rounded-2xl p-4 outline-none focus:ring-2 focus:ring-black"
+              className="w-full border rounded-2xl p-4 outline-none focus:ring-2 focus:ring-[#014BAA]"
             >
 
               <option value="HADIR">
@@ -428,7 +428,7 @@ export default function AttendancePage() {
                   className="hidden"
                 />
 
-                <div className="bg-black text-white text-center py-3 rounded-2xl font-medium active:scale-[0.98] transition">
+                <div className="bg-[#014BAA] text-white text-center py-3 rounded-2xl font-medium active:scale-[0.98] transition">
 
                   {photo
                     ? "Retake Photo"
@@ -560,7 +560,7 @@ export default function AttendancePage() {
               }
               placeholder="Optional notes..."
               rows={4}
-              className="w-full border rounded-2xl p-4 outline-none focus:ring-2 focus:ring-black resize-none"
+              className="w-full border rounded-2xl p-4 outline-none focus:ring-2 focus:ring-[#014BAA] resize-none"
             />
 
           </div>
@@ -570,7 +570,7 @@ export default function AttendancePage() {
             disabled={submitting}
             className="
             w-full
-            bg-black
+            bg-[#014BAA]
             text-white
             py-4
             rounded-2xl
@@ -585,8 +585,8 @@ export default function AttendancePage() {
           >
 
             {submitting
-              ? "Submitting..."
-              : "Submit Attendance"}
+              ? "Lagi Mengirim... :)"
+              : "Kirim Absensi"}
 
           </button>
 
