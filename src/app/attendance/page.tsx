@@ -16,6 +16,9 @@ import {
 import { submitAttendance } from "@/services/api";
 import { compressImage } from "@/utils/compressImage";
 import { fileToBase64 } from "@/utils/fileToBase64";
+import {
+  getTodayAttendance,
+} from "@/services/api";
 
 export default function AttendancePage() {
 
@@ -52,14 +55,23 @@ export default function AttendancePage() {
   useEffect(() => {
 
     const storedUser =
-      localStorage.getItem("user");
+  localStorage.getItem("user");
 
-    if (!storedUser) {
-      router.push("/");
-      return;
-    }
+if (!storedUser) {
 
-    setUser(JSON.parse(storedUser));
+  router.push("/");
+
+  return;
+}
+
+const parsedUser =
+  JSON.parse(storedUser);
+
+setUser(parsedUser);
+
+checkTodayAttendance(
+  parsedUser.username
+);
 
     navigator.geolocation.getCurrentPosition(
 
@@ -95,7 +107,15 @@ export default function AttendancePage() {
       setCurrentTime(new Date());
     }, 1000);
 
-    return () => clearInterval(timer);
+    return () => {
+
+  clearInterval(timer);
+
+  if (photoPreview) {
+    URL.revokeObjectURL(photoPreview);
+  }
+};
+    
 
   }, [router]);
 
@@ -154,6 +174,30 @@ export default function AttendancePage() {
     );
   }
 
+  async function checkTodayAttendance(
+  username: string
+) {
+
+  try {
+
+    const result =
+      await getTodayAttendance(
+        username
+      );
+
+    if (result.success) {
+
+      router.push(
+        "/attendance/result"
+      );
+    }
+
+  } catch (error) {
+
+    console.error(error);
+
+  }
+}
   async function handleSubmit() {
 
     if (submitting) return;
@@ -236,13 +280,9 @@ export default function AttendancePage() {
 
       if (result.success) {
 
-        alert(
-          "Absensi berhasil dikirim, Semoga Lancar selalu ya!"
+        router.push(
+        "/attendance/result"
         );
-
-        setPhoto(null);
-        setPhotoPreview(null);
-        setNotes("");
 
       } else {
 
@@ -271,7 +311,7 @@ export default function AttendancePage() {
   }
 
   return (
-    <main className="min-h-screen bg-bg-[#F8F3F0] pb-10">
+    <main className="min-h-screen bg-[#F8F3F0] pb-10">
 
       <section className="bg-[#014BAA] text-white rounded-b-3xl px-5 pt-6 pb-8 shadow-lg">
 

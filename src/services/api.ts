@@ -39,3 +39,24 @@ export async function submitAttendance(data: any) {
 
   return response.json();
 }
+
+export async function getTodayAttendance(
+  username: string
+) {
+
+  const response = await fetch(API_URL, {
+    method: "POST",
+
+    headers: {
+      "Content-Type":
+        "text/plain;charset=utf-8",
+    },
+
+    body: JSON.stringify({
+      action: "getTodayAttendance",
+      username,
+    }),
+  });
+
+  return response.json();
+}
