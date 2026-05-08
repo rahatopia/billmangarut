@@ -87,6 +87,13 @@ export default function AttendanceResultPage() {
     }
   }
 
+  function handleLogout() {
+
+    localStorage.removeItem("user");
+
+    router.push("/");
+  }
+
   if (loading) {
 
     return (
@@ -102,66 +109,59 @@ export default function AttendanceResultPage() {
     );
   }
 
-  function handleLogout() {
-
-  localStorage.removeItem("user");
-
-  router.push("/");
-}
-
   return (
 
-    <main className="min-h-screen bg-[#F8F3F0] pb-10">
+    <main className="min-h-screen bg-[#F8F3F0] pb-6">
 
-      <section className="bg-[#014BAA] text-white rounded-b-3xl px-5 pt-6 pb-8 shadow-lg">
+      <section className="bg-[#014BAA] text-white rounded-b-3xl px-5 pt-5 pb-6 shadow-lg">
 
-  <div className="flex items-start justify-between mb-6">
+        <div className="flex items-start justify-between mb-5">
 
-    <button
-      onClick={() =>
-        router.push(
-          "/attendance"
-        )
-      }
-      className="bg-white/10 p-3 rounded-xl"
-    >
+          <button
+            onClick={() =>
+              router.push(
+                "/attendance"
+              )
+            }
+            className="bg-white/10 p-3 rounded-xl"
+          >
 
-      <ArrowLeft size={18} />
+            <ArrowLeft size={18} />
 
-    </button>
+          </button>
 
-    <button
-      onClick={handleLogout}
-      className="bg-white/10 p-3 rounded-xl"
-    >
+          <button
+            onClick={handleLogout}
+            className="bg-white/10 p-3 rounded-xl"
+          >
 
-      <LogOut size={18} />
+            <LogOut size={18} />
 
-    </button>
+          </button>
 
-  </div>
+        </div>
 
-  <div>
+        <div>
 
-    <p className="text-sm text-blue-100">
+          <p className="text-sm text-blue-100">
 
-      Absensi Hari Ini
+            Absensi Hari Ini
 
-    </p>
+          </p>
 
-    <h1 className="text-3xl font-bold mt-2">
+          <h1 className="text-3xl font-bold mt-2">
 
-      {attendance?.attendance}
+            {attendance?.attendance}
 
-    </h1>
+          </h1>
 
-  </div>
+        </div>
 
-</section>
+      </section>
 
-      <section className="px-4 -mt-5 max-w-md mx-auto">
+      <section className="px-4 -mt-4 max-w-md mx-auto">
 
-        <div className="bg-white rounded-3xl shadow-xl p-5 space-y-5">
+        <div className="bg-white rounded-3xl shadow-xl p-4 space-y-4">
 
           <div className="flex items-center gap-3">
 
@@ -169,7 +169,7 @@ export default function AttendanceResultPage() {
 
               <CheckCircle2
                 className="text-green-600"
-                size={24}
+                size={22}
               />
 
             </div>
@@ -188,7 +188,7 @@ export default function AttendanceResultPage() {
 
           </div>
 
-          <div className="border-t pt-5 space-y-4">
+          <div className="border-t pt-4 space-y-4">
 
             <div className="flex items-start gap-3">
 
@@ -205,24 +205,24 @@ export default function AttendanceResultPage() {
 
                 <p className="font-medium">
 
-                {new Date(
-                 attendance?.timestamp
-                ).toLocaleDateString(
-                  "id-ID",
-                 {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-                }
-                )}
+                  {new Date(
+                    attendance?.timestamp
+                  ).toLocaleDateString(
+                    "id-ID",
+                    {
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "numeric",
+                    }
+                  )}
 
-            {" • "}
+                  {" • "}
 
-            {new Date(
-            attendance?.timestamp
-            ).toLocaleTimeString(
-              "id-ID"
-                )}
+                  {new Date(
+                    attendance?.timestamp
+                  ).toLocaleTimeString(
+                    "id-ID"
+                  )}
 
                 </p>
 
@@ -268,7 +268,7 @@ export default function AttendanceResultPage() {
                   Catatan
                 </p>
 
-                <p className="font-medium">
+                <p className="font-medium break-words">
 
                   {attendance?.notes ||
                     "-"}
@@ -283,7 +283,7 @@ export default function AttendanceResultPage() {
 
           {attendance?.photoUrl && (
 
-            <div className="pt-2">
+            <div className="pt-1">
 
               <p className="text-sm text-gray-500 mb-3">
 
@@ -294,7 +294,13 @@ export default function AttendanceResultPage() {
               <img
                 src={attendance.photoUrl}
                 alt="Attendance"
-                className="w-full rounded-2xl border"
+                className="
+                  w-full
+                  max-h-[45vh]
+                  object-cover
+                  rounded-2xl
+                  border
+                "
               />
 
             </div>
