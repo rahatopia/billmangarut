@@ -13,27 +13,31 @@ import {
   ClipboardList,
 } from "lucide-react";
 
-import { submitAttendance } from "@/services/api";
-import { compressImage } from "@/utils/compressImage";
-import { fileToBase64 } from "@/utils/fileToBase64";
 import {
+  submitAttendance,
   getTodayAttendance,
 } from "@/services/api";
+
+import { compressImage } from "@/utils/compressImage";
+
+import { fileToBase64 } from "@/utils/fileToBase64";
 
 export default function AttendancePage() {
 
   const router = useRouter();
 
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] =
+    useState<any>(null);
 
   const [attendanceType, setAttendanceType] =
     useState("HADIR");
 
-  const [location, setLocation] = useState<{
-    latitude: number;
-    longitude: number;
-    accuracy: number;
-  } | null>(null);
+  const [location, setLocation] =
+    useState<{
+      latitude: number;
+      longitude: number;
+      accuracy: number;
+    } | null>(null);
 
   const [photo, setPhoto] =
     useState<File | null>(null);
@@ -41,7 +45,8 @@ export default function AttendancePage() {
   const [photoPreview, setPhotoPreview] =
     useState<string | null>(null);
 
-  const [notes, setNotes] = useState("");
+  const [notes, setNotes] =
+    useState("");
 
   const [loadingLocation, setLoadingLocation] =
     useState(true);
@@ -49,39 +54,75 @@ export default function AttendancePage() {
   const [submitting, setSubmitting] =
     useState(false);
 
+  const [gpsConfirmed, setGpsConfirmed] =
+    useState(false);
+
   const [currentTime, setCurrentTime] =
     useState(new Date());
 
   useEffect(() => {
 
-    const storedUser =
-  localStorage.getItem("user");
+    if (!navigator.onLine) {
 
-if (!storedUser) {
-
-  router.push("/");
-
-  return;
+  alert(
+    "Koneksi internet tidak tersedia"
+  );
 }
 
-const parsedUser =
-  JSON.parse(storedUser);
+    const storedUser =
+      localStorage.getItem("user");
 
-setUser(parsedUser);
+    if (!storedUser) {
 
-checkTodayAttendance(
-  parsedUser.username
-);
+      router.push("/");
+
+      return;
+    }
+
+    let parsedUser;
+
+    try {
+
+      parsedUser =
+        JSON.parse(storedUser);
+
+    } catch (error) {
+
+      console.error(error);
+
+      localStorage.removeItem("user");
+
+      router.push("/");
+
+      return;
+    }
+
+    setUser(parsedUser);
+
+    checkTodayAttendance(
+      parsedUser.username
+    );
 
     navigator.geolocation.getCurrentPosition(
 
       (position) => {
 
-        setLocation({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          accuracy: position.coords.accuracy,
-        });
+        if (
+          position &&
+          position.coords
+        ) {
+
+          setLocation({
+            latitude:
+              position.coords.latitude,
+
+            longitude:
+              position.coords.longitude,
+
+            accuracy:
+              position.coords.accuracy,
+          });
+        }
 
         setLoadingLocation(false);
       },
@@ -92,7 +133,9 @@ checkTodayAttendance(
 
         setLoadingLocation(false);
 
-        alert("Gagal Mendapatkan GPS, Pastikan GPS Aktif dan Beri Izin Akses Lokasi");
+        alert(
+          "Gagal Mendapatkan GPS, Pastikan GPS Aktif dan Beri Izin Akses Lokasi"
+        );
       },
 
       {
@@ -104,40 +147,24 @@ checkTodayAttendance(
     );
 
     const timer = setInterval(() => {
+
       setCurrentTime(new Date());
+
     }, 1000);
 
     return () => {
 
-  clearInterval(timer);
+      clearInterval(timer);
 
-  if (photoPreview) {
-    URL.revokeObjectURL(photoPreview);
-  }
-};
-    
+      if (photoPreview) {
+
+        URL.revokeObjectURL(
+          photoPreview
+        );
+      }
+    };
 
   }, [router]);
-
-  function handlePhotoChange(
-    e: React.ChangeEvent<HTMLInputElement>
-  ) {
-
-    if (
-      e.target.files &&
-      e.target.files[0]
-    ) {
-
-      const file = e.target.files[0];
-
-      setPhoto(file);
-
-      const imageUrl =
-        URL.createObjectURL(file);
-
-      setPhotoPreview(imageUrl);
-    }
-  }
 
   function refreshLocation() {
 
@@ -147,11 +174,22 @@ checkTodayAttendance(
 
       (position) => {
 
-        setLocation({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          accuracy: position.coords.accuracy,
-        });
+        if (
+          position &&
+          position.coords
+        ) {
+
+          setLocation({
+            latitude:
+              position.coords.latitude,
+
+            longitude:
+              position.coords.longitude,
+
+            accuracy:
+              position.coords.accuracy,
+          });
+        }
 
         setLoadingLocation(false);
       },
@@ -162,7 +200,9 @@ checkTodayAttendance(
 
         setLoadingLocation(false);
 
-        alert("Gagal Memperbaharui GPS, Coba Lagi");
+        alert(
+          "Gagal Memperbaharui GPS, Coba Lagi"
+        );
       },
 
       {
@@ -175,29 +215,67 @@ checkTodayAttendance(
   }
 
   async function checkTodayAttendance(
-  username: string
-) {
+    username: string
+  ) {
 
-  try {
+    try {
 
-    const result =
-      await getTodayAttendance(
-        username
-      );
+      const result =
+        await getTodayAttendance(
+          username
+        );
 
-    if (result.success) {
+      if (
+        result &&
+        result.success
+      ) {
 
-      router.push(
-        "/attendance/result"
+        router.push(
+          "/attendance/result"
+        );
+      }
+
+    } catch (error) {
+
+      console.error(error);
+
+    }
+  }
+
+  function handlePhotoChange(
+    e: React.ChangeEvent<HTMLInputElement>
+  ) {
+
+    try {
+
+      if (
+        e.target.files &&
+        e.target.files[0]
+      ) {
+
+        const file =
+          e.target.files[0];
+
+        setPhoto(file);
+
+        const imageUrl =
+          URL.createObjectURL(file);
+
+        setPhotoPreview(
+          imageUrl
+        );
+      }
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert(
+        "Gagal memproses foto"
       );
     }
-
-  } catch (error) {
-
-    console.error(error);
-
   }
-}
+
   async function handleSubmit() {
 
     if (submitting) return;
@@ -207,7 +285,9 @@ checkTodayAttendance(
       !photo
     ) {
 
-      alert("Selfie dulu ya untuk absen hadir");
+      alert(
+        "Selfie dulu ya untuk absen hadir"
+      );
 
       return;
     }
@@ -217,7 +297,9 @@ checkTodayAttendance(
       !location
     ) {
 
-      alert("Lokasi GPS dibutuhkan untuk absen hadir");
+      alert(
+        "Lokasi GPS dibutuhkan untuk absen hadir"
+      );
 
       return;
     }
@@ -225,14 +307,25 @@ checkTodayAttendance(
     if (
       attendanceType === "HADIR" &&
       location &&
-      location.accuracy > 100
+      location.accuracy > 100 &&
+      !gpsConfirmed
     ) {
 
-      alert(
-        "Akurasi GPS terlalu rendah. Silakan pindah ke area terbuka dan coba lagi."
-      );
+      const continueSubmit =
+        window.confirm(
+          `Akurasi GPS saat ini ${Math.round(
+            location.accuracy
+          )}m.\n\nGPS kurang akurat.\n\nPilih OK untuk lanjut absensi atau Cancel untuk refresh GPS.`
+        );
 
-      return;
+      if (!continueSubmit) {
+
+        refreshLocation();
+
+        return;
+      }
+
+      setGpsConfirmed(true);
     }
 
     try {
@@ -258,11 +351,17 @@ checkTodayAttendance(
       const result =
         await submitAttendance({
 
-          username: user.username,
-          name: user.name,
-          unit: user.unit,
+          username:
+            user?.username || "",
 
-          type: attendanceType,
+          name:
+            user?.name || "",
+
+          unit:
+            user?.unit || "",
+
+          type:
+            attendanceType,
 
           latitude:
             location?.latitude || "",
@@ -278,23 +377,32 @@ checkTodayAttendance(
           photo: base64Photo,
         });
 
-      if (result.success) {
+      if (
+        result &&
+        result.success
+      ) {
+
+        setGpsConfirmed(false);
 
         router.push(
-        "/attendance/result"
+          "/attendance/result"
         );
 
       } else {
 
-        alert(result.message);
-
+        alert(
+          result?.message ||
+          "Gagal mengirim absensi"
+        );
       }
 
     } catch (error) {
 
       console.error(error);
 
-      alert("Gagal Mengirim Absensi, Coba Lagi");
+      alert(
+        "Gagal Mengirim Absensi, Coba Lagi"
+      );
 
     } finally {
 
@@ -311,6 +419,7 @@ checkTodayAttendance(
   }
 
   return (
+
     <main className="min-h-screen bg-[#F8F3F0] pb-10">
 
       <section className="bg-[#014BAA] text-white rounded-b-3xl px-5 pt-6 pb-8 shadow-lg">
@@ -328,7 +437,7 @@ checkTodayAttendance(
             </h1>
 
             <p className="text-sm text-gray-400 mt-1">
-              {user?.unit}
+              {user?.unit || "-"}
             </p>
 
           </div>
@@ -337,7 +446,9 @@ checkTodayAttendance(
             onClick={handleLogout}
             className="bg-white/10 p-3 rounded-xl active:scale-95 transition"
           >
+
             <LogOut size={18} />
+
           </button>
 
         </div>
@@ -357,6 +468,7 @@ checkTodayAttendance(
           </h2>
 
           <p className="text-sm text-gray-600 mt-2">
+
             {currentTime.toLocaleDateString(
               "id-ID",
               {
@@ -366,6 +478,7 @@ checkTodayAttendance(
                 day: "numeric",
               }
             )}
+
           </p>
 
         </div>
@@ -588,7 +701,7 @@ checkTodayAttendance(
               <FileText size={18} />
 
               <h3 className="font-semibold">
-                Rencana Kerja Hari Ini
+                Catatan
               </h3>
 
             </div>
@@ -598,7 +711,7 @@ checkTodayAttendance(
               onChange={(e) =>
                 setNotes(e.target.value)
               }
-              placeholder="Optional notes..."
+              placeholder="Tambahkan catatan jika diperlukan..."
               rows={4}
               className="w-full border rounded-2xl p-4 outline-none focus:ring-2 focus:ring-[#014BAA] resize-none"
             />
@@ -608,24 +721,11 @@ checkTodayAttendance(
           <button
             onClick={handleSubmit}
             disabled={submitting}
-            className="
-            w-full
-            bg-[#014BAA]
-            text-white
-            py-4
-            rounded-2xl
-            font-semibold
-            text-lg
-            shadow-lg
-            active:scale-[0.98]
-            transition
-            disabled:opacity-50
-            disabled:cursor-not-allowed
-            "
+            className="w-full bg-[#014BAA] text-white py-4 rounded-2xl font-semibold text-lg shadow-lg active:scale-[0.98] transition disabled:opacity-50"
           >
 
             {submitting
-              ? "Lagi Mengirim... :)"
+              ? "Mengirim Absensi..."
               : "Kirim Absensi"}
 
           </button>
