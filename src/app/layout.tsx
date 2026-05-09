@@ -1,4 +1,7 @@
-import type { Metadata } from "next";
+import type {
+  Metadata,
+  Viewport,
+} from "next";
 
 import {
   Geist,
@@ -24,6 +27,20 @@ export const metadata: Metadata = {
 
   manifest: "/manifest.json",
 
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "BILLMAN Attendance",
+  },
+
+  icons: {
+    icon: "/icon.png",
+    apple: "/icon.png",
+  },
+};
+
+export const viewport: Viewport = {
+
   themeColor: "#014BAA",
 };
 
@@ -32,7 +49,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
 
   return (
 
