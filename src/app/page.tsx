@@ -138,7 +138,7 @@ export default function HomePage() {
             <Image
               src="/logo.png"
               alt="Logo"
-              width={90}
+              width={200}
               height={90}
               priority
               className="drop-shadow-md"
