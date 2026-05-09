@@ -1,17 +1,51 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { login } from "@/services/api";
+import Image from "next/image";
+
+import {
+  useEffect,
+  useState,
+} from "react";
+
+import { useRouter }
+from "next/navigation";
+
+import { login }
+from "@/services/api";
+
+import {
+  Loader2,
+  LogIn,
+} from "lucide-react";
 
 export default function HomePage() {
 
   const router = useRouter();
 
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] =
+    useState("");
 
-  const [loading, setLoading] = useState(false);
+  const [password, setPassword] =
+    useState("");
+
+  const [loading, setLoading] =
+    useState(false);
+
+  useEffect(() => {
+
+    const storedUser =
+      localStorage.getItem(
+        "user"
+      );
+
+    if (storedUser) {
+
+      router.push(
+        "/attendance"
+      );
+    }
+
+  }, [router]);
 
   async function handleLogin(
     e: React.FormEvent
@@ -19,37 +53,70 @@ export default function HomePage() {
 
     e.preventDefault();
 
+    if (
+      !username ||
+      !password
+    ) {
+
+      alert(
+        "Username dan password wajib diisi"
+      );
+
+      return;
+    }
+
+    if (!navigator.onLine) {
+
+      alert(
+        "Tidak ada koneksi internet"
+      );
+
+      return;
+    }
+
     try {
 
       setLoading(true);
 
-      const result = await login(
-        username,
-        password
-      );
+      const result =
+        await login(
+          username,
+          password
+        );
 
       console.log(result);
 
-      if (result.success) {
+      if (
+        result &&
+        result.success
+      ) {
 
         localStorage.setItem(
           "user",
-          JSON.stringify(result.user)
+          JSON.stringify(
+            result.user
+          )
         );
 
-        router.push("/attendance");
+        router.push(
+          "/attendance"
+        );
 
       } else {
 
-        alert(result.message);
-
+        alert(
+          result?.message ||
+          "Username atau password salah"
+        );
       }
 
     } catch (error) {
 
       console.error(error);
 
-      alert("Login failed");
+      alert(
+        "Tidak dapat terhubung ke server.\n\nSilakan coba kembali."
+      );
 
     } finally {
 
@@ -59,72 +126,165 @@ export default function HomePage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
 
-      <div className="bg-white p-8 rounded-2xl shadow-md w-full max-w-sm">
+    <main className="min-h-screen bg-[#F8F3F0] flex items-center justify-center px-4">
 
-        <h1 className="text-2xl font-bold text-center mb-6">
-          Laporan Absensi
-        </h1>
+      <div className="w-full max-w-sm">
 
-        <h1 className="text-2xl font-bold text-center mb-6">
-          BILLMAN UP3 GARUT
-        </h1>
-        
-        <form
-          onSubmit={handleLogin}
-          className="space-y-4"
-        >
+        <div className="bg-white rounded-3xl shadow-xl p-6">
 
-          <div>
+          <div className="flex flex-col items-center mb-8">
 
-            <label className="block mb-1 text-sm font-medium">
-              Username
-            </label>
-
-            <input
-              type="text"
-              value={username}
-              onChange={(e) =>
-                setUsername(e.target.value)
-              }
-              className="w-full border rounded-lg px-3 py-2"
-              placeholder="Enter username"
+            <Image
+              src="/logo.png"
+              alt="Logo"
+              width={90}
+              height={90}
+              priority
+              className="drop-shadow-md"
             />
+
+            <h1 className="text-2xl font-bold mt-4 text-[#014BAA] text-center">
+
+              BILLMAN UP3 GARUT
+
+            </h1>
+
+            <p className="text-sm text-gray-500 mt-2 text-center">
+
+              Sistem Absensi Pegawai
+
+            </p>
 
           </div>
 
-          <div>
-
-            <label className="block mb-1 text-sm font-medium">
-              Password
-            </label>
-
-            <input
-              type="password"
-              value={password}
-              onChange={(e) =>
-                setPassword(e.target.value)
-              }
-              className="w-full border rounded-lg px-3 py-2"
-              placeholder="Enter password"
-            />
-
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-black text-white py-2 rounded-lg"
+          <form
+            onSubmit={handleLogin}
+            className="space-y-5"
           >
 
-            {loading
-              ? "Loading..."
-              : "Login"}
+            <div>
 
-          </button>
+              <label className="block mb-2 text-sm font-medium text-gray-700">
 
-        </form>
+                Username
+
+              </label>
+
+              <input
+                type="text"
+                value={username}
+                autoComplete="username"
+                inputMode="text"
+                onChange={(e) =>
+                  setUsername(
+                    e.target.value
+                  )
+                }
+                className="
+                  w-full
+                  border
+                  rounded-2xl
+                  px-4
+                  py-3
+                  outline-none
+                  focus:ring-2
+                  focus:ring-[#014BAA]
+                "
+                placeholder="Masukkan username"
+              />
+
+            </div>
+
+            <div>
+
+              <label className="block mb-2 text-sm font-medium text-gray-700">
+
+                Password
+
+              </label>
+
+              <input
+                type="password"
+                value={password}
+                autoComplete="current-password"
+                onChange={(e) =>
+                  setPassword(
+                    e.target.value
+                  )
+                }
+                className="
+                  w-full
+                  border
+                  rounded-2xl
+                  px-4
+                  py-3
+                  outline-none
+                  focus:ring-2
+                  focus:ring-[#014BAA]
+                "
+                placeholder="Masukkan password"
+              />
+
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="
+                w-full
+                bg-[#014BAA]
+                text-white
+                py-3
+                rounded-2xl
+                font-semibold
+                flex
+                items-center
+                justify-center
+                gap-2
+                active:scale-[0.98]
+                transition
+                disabled:opacity-60
+                disabled:cursor-not-allowed
+              "
+            >
+
+              {loading ? (
+
+                <>
+
+                  <Loader2
+                    className="animate-spin"
+                    size={18}
+                  />
+
+                  Masuk...
+
+                </>
+
+              ) : (
+
+                <>
+
+                  <LogIn size={18} />
+
+                  Masuk
+
+                </>
+
+              )}
+
+            </button>
+
+          </form>
+
+        </div>
+
+        <p className="text-center text-xs text-gray-500 mt-5">
+
+          v2.0 Internal System
+
+        </p>
 
       </div>
 

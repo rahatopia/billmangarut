@@ -16,9 +16,15 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+
   title: "BILLMAN UP3 GARUT",
+
   description:
     "Attendance app for BILLMAN UP3 GARUT",
+
+  manifest: "/manifest.json",
+
+  themeColor: "#014BAA",
 };
 
 export default function RootLayout({
@@ -27,8 +33,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
 
+
   return (
-    <html lang="en">
+
+    <html
+      lang="en"
+      suppressHydrationWarning
+    >
 
       <body
         className={`

@@ -280,6 +280,15 @@ export default function AttendancePage() {
 
     if (submitting) return;
 
+    if (!navigator.onLine) {
+
+    alert(
+    "Tidak ada koneksi internet.\n\nPeriksa koneksi lalu coba kembali."
+    );
+
+    return;
+    }
+
     if (
       attendanceType === "HADIR" &&
       !photo
@@ -392,7 +401,7 @@ export default function AttendancePage() {
 
         alert(
           result?.message ||
-          "Gagal mengirim absensi"
+          "Gagal mengirim absensi.\n\nPeriksa koneksi internet lalu coba kembali."
         );
       }
 
@@ -401,7 +410,7 @@ export default function AttendancePage() {
       console.error(error);
 
       alert(
-        "Gagal Mengirim Absensi, Coba Lagi"
+        "Absensi gagal dikirim.\n\nSilakan coba kembali."
       );
 
     } finally {
@@ -721,7 +730,20 @@ export default function AttendancePage() {
           <button
             onClick={handleSubmit}
             disabled={submitting}
-            className="w-full bg-[#014BAA] text-white py-4 rounded-2xl font-semibold text-lg shadow-lg active:scale-[0.98] transition disabled:opacity-50"
+            className="
+            w-full
+            bg-[#014BAA]
+            text-white
+            py-4
+            rounded-2xl
+            font-semibold
+            text-lg
+            shadow-lg
+            active:scale-[0.98]
+            transition
+            disabled:opacity-50
+            disabled:cursor-not-allowed
+"
           >
 
             {submitting
