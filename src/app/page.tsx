@@ -146,7 +146,7 @@ export default function HomePage() {
 
             <h1 className="text-2xl font-bold mt-4 text-[#014BAA] text-center">
 
-              ABSENSI BILLMAN
+              BILLMAN {process.env.NEXT_PUBLIC_REGION}
 
             </h1>
 
