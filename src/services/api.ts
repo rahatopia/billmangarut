@@ -1,4 +1,5 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbzJ5FJAweO547jRg6Fd66GtiZh8X9L1xuBJ5QxTmuu9V_p5Jtbl74DvAuSB9Hq8UMIm/exec";
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL!;
 
 export async function login(
   username: string,

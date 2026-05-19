@@ -146,7 +146,7 @@ export default function HomePage() {
 
             <h1 className="text-2xl font-bold mt-4 text-[#014BAA] text-center">
 
-              BILLMAN UP3 GARUT
+              BILLMAN UP3 CIREBON
 
             </h1>
 

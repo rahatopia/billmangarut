@@ -20,10 +20,10 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
 
-  title: "BILLMAN UP3 GARUT",
+  title: "BILLMAN UP3 CIREBON",
 
   description:
-    "Attendance app for BILLMAN UP3 GARUT",
+    "Attendance app for BILLMAN UP3 CIREBON",
 
   manifest: "/manifest.json",
 
