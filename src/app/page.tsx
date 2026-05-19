@@ -146,13 +146,13 @@ export default function HomePage() {
 
             <h1 className="text-2xl font-bold mt-4 text-[#014BAA] text-center">
 
-              BILLMAN UP3 CIREBON
+              ABSENSI BILLMAN
 
             </h1>
 
             <p className="text-sm text-gray-500 mt-2 text-center">
 
-              Sistem Absensi Pegawai
+              PT Mandiri Insan Usaha
 
             </p>
 
